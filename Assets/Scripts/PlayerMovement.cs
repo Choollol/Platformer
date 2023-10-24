@@ -2,23 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D), typeof(InputController))]
+
 public class PlayerMovement : MonoBehaviour
 {
     /*
      * Requires child "Ground Check" object at feet/bottom of player object
      * Create layer named "Ground" and add to groundLayers and objects player can jump off of
+     * Default paramters: 1 mass, 3 gravity, 12 jump force, 10 speed
      */
 
     private Rigidbody2D rb;
+    private InputController inputController;
 
     private Transform groundCheck;
     [SerializeField] private List<LayerMask> groundLayers;
-    [SerializeField] private float groundCheckRadius;
 
     [SerializeField] private float jumpForce;
 
     private bool isGrounded;
-    private bool isJumping;
+    //private bool isJumping;
 
     private int extraJumps = 0;
     private int extraJumpsCounter = 0;
@@ -29,7 +32,6 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 velocity;
 
-    private float horizontalInput;
     [SerializeField] private float speed;
 
     private Vector2 additionalForce;
@@ -46,38 +48,20 @@ public class PlayerMovement : MonoBehaviour
     }
     void Update()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-
-        //GroundedUpdate();
         JumpUpdate();
 
         additionalForce -= additionalForceDecrement;
     }
     private void MovementUpdate()
     {
-        velocity = new Vector3(horizontalInput, 0) * speed;
+        velocity = new Vector3(inputController.horizontalInput, 0) * speed;
 
         rb.velocity = new Vector2(velocity.x, rb.velocity.y) + additionalForce;
-        //transform.position += new Vector3(velocity.x * Time.fixedDeltaTime, 0);
-        //rb.AddForce(new Vector2(velocity.x, 0));
     }
-
-    /*private void GroundedUpdate()
-    {
-        foreach (LayerMask groundLayer in groundLayers) 
-        {
-            if (Physics2D.Raycast(groundCheck.transform.position, Vector2.down, groundCheckRadius, groundLayer)
-                && jumpTimer > jumpCooldown)
-            {
-                isGrounded = true;
-                isJumping = false;
-                extraJumpsCounter = 0;
-            }
-        }
-    }*/
     private void JumpUpdate()
     {
         float dt = Time.deltaTime;
+        bool doJump = inputController.doJump;
 
         if (isGrounded || extraJumpsCounter < extraJumps)
         {
@@ -88,7 +72,7 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimeCounter -= dt;
         }
 
-        if (Input.GetButtonDown("Jump"))
+        if (doJump)
         {
             jumpBufferCounter = jumpBuffer;
         }
@@ -110,10 +94,10 @@ public class PlayerMovement : MonoBehaviour
                 extraJumpsCounter++;
             }
             isGrounded = false;
-            isJumping = true;
+            //isJumping = true;
             //AudioManager.PlaySound("Jump Sound");
         }
-        if (Input.GetButtonUp("Jump") && rb.velocity.y > 0)
+        if (doJump && rb.velocity.y > 0)
         {
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
 
