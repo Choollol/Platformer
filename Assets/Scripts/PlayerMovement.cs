@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
 
     private int extraJumps = 0;
     private int extraJumpsCounter = 0;
-    private float coyoteTime = 0.1f;
+    private float coyoteTime = 0.06f;
     private float coyoteTimeCounter = 0;
     private float jumpBuffer = 0.1f;
     private float jumpBufferCounter = 0;
