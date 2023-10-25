@@ -11,8 +11,9 @@ public class InputController : MonoBehaviour
 
     public float horizontalInput { get; private set; }
     public bool doJump { get; private set; }
+    public bool isJumpHeld { get; private set; }
 
-    private InputType type;
+    [SerializeField] private InputType type;
 
     [SerializeField] private string controlsPrefix; // For example: "Player 1" for "Player 1 Horizontal" movement
 
@@ -35,6 +36,7 @@ public class InputController : MonoBehaviour
             {
                 horizontalInput = Input.GetAxisRaw(controlsPrefix + "Horizontal");
                 doJump = Input.GetButtonDown(controlsPrefix + "Jump");
+                isJumpHeld = Input.GetButton(controlsPrefix + "Jump");
             }
         }
     }

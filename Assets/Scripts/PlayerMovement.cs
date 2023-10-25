@@ -21,7 +21,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float jumpForce;
 
     private bool isGrounded;
-    //private bool isJumping;
+    private bool isJumping;
+
+    private float jumpCounter = 0;
 
     private int extraJumps = 0;
     private int extraJumpsCounter = 0;
@@ -39,8 +41,11 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        inputController = GetComponent<InputController>();
 
         groundCheck = transform.GetChild(0);
+
+        CameraController.Instance.SetTarget(gameObject);
     }
     private void FixedUpdate()
     {
@@ -61,8 +66,8 @@ public class PlayerMovement : MonoBehaviour
     private void JumpUpdate()
     {
         float dt = Time.deltaTime;
-        bool doJump = inputController.doJump;
 
+        // Coyote time
         if (isGrounded || extraJumpsCounter < extraJumps)
         {
             coyoteTimeCounter = coyoteTime;
@@ -72,7 +77,8 @@ public class PlayerMovement : MonoBehaviour
             coyoteTimeCounter -= dt;
         }
 
-        if (doJump)
+        // Jump buffer
+        if (inputController.doJump)
         {
             jumpBufferCounter = jumpBuffer;
         }
@@ -81,8 +87,15 @@ public class PlayerMovement : MonoBehaviour
             jumpBufferCounter -= dt;
         }
 
-        if (coyoteTimeCounter > 0 && jumpBufferCounter > 0)
+        // Jump
+        if (coyoteTimeCounter > 0 && jumpBufferCounter > 0 && (!isJumping || jumpCounter > 0.01f))
         {
+            // Jump counter to prevent multiple jump button forces
+            if (isJumping)
+            {
+                jumpCounter += dt;
+            }
+
             if (rb.velocity.y < 0)
             {
                 rb.velocity = new Vector2(rb.velocity.x, 0);
@@ -94,28 +107,34 @@ public class PlayerMovement : MonoBehaviour
                 extraJumpsCounter++;
             }
             isGrounded = false;
-            //isJumping = true;
+            isJumping = true;
             //AudioManager.PlaySound("Jump Sound");
+            jumpCounter = 0;
         }
-        if (doJump && rb.velocity.y > 0)
+        // Variable jump height
+        if (!inputController.isJumpHeld && rb.velocity.y > 0)
         {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.96f);
 
             coyoteTimeCounter = 0;
         }
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        // Grounded
         foreach (LayerMask groundLayer in groundLayers)
         {
-            if (1 << collision.gameObject.layer == groundLayer && collision.transform.position.y < groundCheck.position.y)
+            if (1 << collision.gameObject.layer == groundLayer && collision.transform.position.y < groundCheck.position.y + 0.1f)
             {
                 isGrounded = true;
+                extraJumpsCounter = 0;
+                isJumping = false;
             }
         }
     }
     private void OnCollisionExit2D(Collision2D collision)
     {
+        // Ungrounded
         foreach (LayerMask groundLayer in groundLayers)
         {
             if (1 << collision.gameObject.layer == groundLayer)

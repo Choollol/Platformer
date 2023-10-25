@@ -27,6 +27,9 @@ public class SpriteAnimator : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         inputController = GetComponent<InputController>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+
+        action = Action.Idle;
     }
 
     void Update()
@@ -37,7 +40,13 @@ public class SpriteAnimator : MonoBehaviour
             ActionUpdate();
         }
 
-        animator.Play("Base Layer." + spriteName + "_" + action);
+        string animation = spriteName + "_" + action;
+
+        if (animator.HasState(0, Animator.StringToHash(animation)))
+        {
+            animator.Play("Base Layer." + animation);
+        }
+
     }
     protected virtual void DirectionUpdate()
     {
