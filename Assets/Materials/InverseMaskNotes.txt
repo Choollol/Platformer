@@ -1,4 +1,5 @@
 https://discussions.unity.com/t/invert-reverse-ui-mask/148603/5
+
 ---- Mask Material
 
 Tint Color                  (255,255,255,1) //using alpha of 1 gives crispest edge
@@ -22,6 +23,6 @@ Color Mask                  15
 Use Alpha Clip              False
 
 
-Image with "Mask" material must be higher than image with "Masked" material in the hierarchy. (Don't have to be parent and child).
+Images with "Mask" material must be higher than images with "Masked" material in the hierarchy. (Don't have to be parent and child).
 Works even if they are in different canvases.
 Images without "Masked" material are not cut out.
