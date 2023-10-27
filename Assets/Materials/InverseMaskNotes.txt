@@ -1,0 +1,4 @@
+
+Image with "Mask" material must be higher than image with "Masked" material in the hierarchy. (Don't have to be parent and child).
+Works even if they are in different canvases.
+Images without "Masked" material are not cut out.
