@@ -1,0 +1,28 @@
+https://discussions.unity.com/t/invert-reverse-ui-mask/148603/5
+
+---- Mask Material
+
+Tint Color                  (255,255,255,1) //using alpha of 1 gives crispest edge
+Stencil Comparison          8
+Stencil ID                  1
+Stencil Operation           2
+Stencil Write Mask          255
+Stencil Read Mask           255
+Color Mask                  0 // use 15 if you want to see the mask graphic (0 vs RGB 1110)
+Use Alpha Clip              True // toggles if the graphic affects the mask, or just the geometry
+
+---- Masked Material
+
+Tint Color                  (255,255,255,255) // not important
+Stencil Comparison          3
+Stencil ID                  2 // default Unity mask has 1 here. this is the swap. I think it's GEqual => Less
+Stencil Operation           0
+Stencil Write Mask          0
+Stencil Read Mask           1
+Color Mask                  15
+Use Alpha Clip              False
+
+
+Images with "Mask" material must be higher than images with "Masked" material in the hierarchy. (Don't have to be parent and child).
+Works even if they are in different canvases.
+Images without "Masked" material are not cut out.
